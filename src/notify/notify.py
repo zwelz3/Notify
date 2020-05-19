@@ -9,38 +9,6 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 
 
-class Notify:
-    def __init__(self, email, server='smtp.gmail.com', port='587'):
-        if not email:
-            self.email = input("Email:")
-        else:
-            self.email = email
-
-        try:
-            self.smtp = smtplib.SMTP(server, port)
-            # handshake
-            self.smtp.ehlo()
-            # start TLS
-            self.smtp.starttls()
-            # login to server
-            self.smtp.login(email, getpass("Password:"))
-        except socket.gaierror:
-            print("Network connection error.")
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        # disconnect from the server
-        self.smtp.quit()
-
-    def send(self, msg: Message):
-        try:
-            self.smtp.sendmail(self.email, self.email, msg.message.as_string())
-            print("Message sent successfully!")
-        except socket.gaierror:
-            print("Network connection error. Failed to send message.")
-
 class Message:
     def __init__(
         self,
@@ -83,3 +51,36 @@ class Message:
                 # here we edit the attached file metadata
                 file['Content-Disposition'] = f'attachment; filename="{os.path.basename(one_attachment)}"'
                 self.message.attach(file)  # finally, add the attachment to our message object
+
+
+class Notify:
+    def __init__(self, email, server='smtp.gmail.com', port='587'):
+        if not email:
+            self.email = input("Email:")
+        else:
+            self.email = email
+
+        try:
+            self.smtp = smtplib.SMTP(server, port)
+            # handshake
+            self.smtp.ehlo()
+            # start TLS
+            self.smtp.starttls()
+            # login to server
+            self.smtp.login(email, getpass("Password:"))
+        except socket.gaierror:
+            print("Network connection error.")
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        # disconnect from the server
+        self.smtp.quit()
+
+    def send(self, msg: Message):
+        try:
+            self.smtp.sendmail(self.email, self.email, msg.message.as_string())
+            print("Message sent successfully!")
+        except socket.gaierror:
+            print("Network connection error. Failed to send message.")
